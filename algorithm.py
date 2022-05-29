@@ -286,7 +286,7 @@ class App(QMainWindow):
         # Create a button in the window
         self.button = QPushButton('Provjeri istinitost!', self)
         self.button.move(20,bottom)
-        self.button.resize(100,40)
+        self.button.resize(150,40)
 
         # connect button to function on_click
         self.button.clicked.connect(self.on_click)
