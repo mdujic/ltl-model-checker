@@ -233,7 +233,7 @@ class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.title = 'Model checker'
+        self.title = 'Provjera modela'
         self.left = 20
         self.top = 20
         self.width = 400
@@ -284,7 +284,7 @@ class App(QMainWindow):
   
  
         # Create a button in the window
-        self.button = QPushButton('Check if valid', self)
+        self.button = QPushButton('Provjeri istinitost!', self)
         self.button.move(20,bottom)
 
         # connect button to function on_click
@@ -306,7 +306,7 @@ class App(QMainWindow):
             textboxValue = str(s)
 
         QMessageBox.question(self, 'Message', "Result is: " + textboxValue, QMessageBox.Ok, QMessageBox.Ok)
-        self.textbox.setText("")
+        self.textbox1.setText("")
 
 
 
