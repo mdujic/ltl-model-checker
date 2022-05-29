@@ -208,56 +208,94 @@ def algorithm(Gamma, i, _l, s):
     return (bool)(psi[-1] in l[0])
 
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QLineEdit, QMessageBox
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import * 
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+
+with open('unos_modela.txt') as f:
+    lines = f.readlines()
+
+
+k = int(lines[0])
+n = int(lines[1])
+
+assert "Ukupna duljina pretperioda i perioda ne poklapa se s brojem linija" and k+n+1 == len(lines) - 2
+assert "(k+2). i zadnja linija se ne poklapaju - ne vrijedi periodičnost" and lines[2 + k] == lines[-1]
+parser = LTLfParser()
+Gamma = [set() for _ in range(k + n + 1)]
+for p in range(2, k+n+1 + 2):
+    lines[p] = ' '.join( lines[p] ).split()
+    for var in lines[p]:       
+        Gamma[p-2].add( parser(var) )
 
 class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.title = 'PyQt5'
-        self.left = 10
-        self.top = 10
+        self.title = 'Model checker'
+        self.left = 20
+        self.top = 20
         self.width = 400
-        self.height = 140
+        self.height = 500
         self.initUI()
     
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
     
+        self.l1 = QLabel(self)
+        self.l1.setText("Upiši formulu LTLa:")
+        self.l1.move(20,20)
+        self.l1.resize(280,40)
+
         # Create textbox
-        self.textbox = QLineEdit(self)
-        self.textbox.move(20, 20)
-        self.textbox.resize(280,40)
+        self.textbox1 = QLineEdit(self)
+        self.textbox1.move(20, 60)
+        self.textbox1.resize(280,40)
+
+        self.l2 = QLabel(self)
+        self.l2.setText("Model (pretperiod i period):")
+        self.l2.move(20,120)
+        self.l2.resize(280,40)
         
+        self.w = [None] * (k+n+1)
+        bottom = 160
+        for i in range(k):
+            self.w[i] = QLabel(self)
+            self.w[i].setText( 'Gamma['+ str(i) + '] = { '+ ''.join( [ str(t)+' ' for t in Gamma[i] ] ) + '}' )
+            self.w[i].move(20, bottom)
+            bottom += 40
+            self.w[i].resize(280,40)
+        
+        bottom -= 10
+        self.p = QLabel(self)
+        self.p.setText('_______________________________________')                
+        self.p.move(20,bottom)
+        self.p.resize(280,40)
+        bottom += 40        
+
+        for i in range(k, k+n+1):
+            self.w[i] = QLabel(self)
+            self.w[i].setText( 'Gamma['+ str(i) + '] = { '+ ''.join( [ str(t)+' ' for t in Gamma[i] ] ) + '}' )
+            self.w[i].move(20, bottom)
+            bottom += 40
+            self.w[i].resize(280,40)
+  
+ 
         # Create a button in the window
         self.button = QPushButton('Check if valid', self)
-        self.button.move(20,80)
-        
+        self.button.move(20,bottom)
+
         # connect button to function on_click
         self.button.clicked.connect(self.on_click)
         self.show()
     
     @pyqtSlot()
     def on_click(self):
-        textboxValue = self.textbox.text()
-        
-        i = 1
-        l = 4
-        parser = LTLfParser()
-        Gamma = [set() for _ in range(i + l + 1)]
-        Gamma[0].add(parser('p'))
-        Gamma[1].add(parser('q'))
-        Gamma[2].add(parser('p'))
-        Gamma[2].add(parser('r'))
-        Gamma[3].add(parser('r'))
-        Gamma[4].add(parser('q'))
-        Gamma[5].add(parser('q'))
-        
+        textboxValue = self.textbox1.text()
 
-        s = algorithm(Gamma, i, l, textboxValue)
+        s = algorithm(Gamma, k, n, textboxValue)
         if s == 'empty':
             textboxValue = 'You have not entered formula.'
         elif(s == EOFError):
