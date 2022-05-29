@@ -140,27 +140,27 @@ def algorithm(Gamma, i, _l, s):
 
         elif isinstance(psi[a], LTLfEventually):
             t = psi[a]._members()[1]
-            period = False
+            event = False
             for j in range(i, i+ _l + 1): #prvo provjeravamo period
                 if (t in l[j]):
-                    period = True
+                    event = True
                     break
-            if (period):
+            if (event):
                 for j in range(i + _l + 1):
                     l[j].add(psi[a]) #ako je na periodu istinita, onda ce svakako biti istinita u svakom stanju
             else:
-                for j in range(i, i + _l + 1): #na periodu je lazna
+                for j in range(i, i + _l + 1): #na periodu nije istinita
                     l[j].add(LTLfNot(psi[a]))
-                for j in range(i): #jos provjeravamo je li na pretperiodu istinita
-                    event = False
-                    for j_ in range(j, i):
-                        if (t in l[j_]):
-                            event = True
-                            break
-                    if(event):
-                        l[j].add(psi[a])
+                for j in range(i - 1, -1, -1): #provjeravamo je li psi na pretperiodu istinita; unazad jer znamo da je na periodu istinita
+                    if (t in l[j]): #cim je psi istinita za prvi j (iduci unazad), F psi je istinita za svaki j'<=j
+                        event = True
+                        break
                     else:
                         l[j].add(LTLfNot(psi[a]))
+                if(event):
+                    for j_ in range(j + 1):
+                        l[j_].add(psi[a])
+
                         
         elif isinstance(psi[a], LTLfRelease):
             t1 = next(islice(psi[a]._members()[1], 0, None))
