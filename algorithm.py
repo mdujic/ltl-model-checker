@@ -1,6 +1,6 @@
 from re import sub
 from base import AtomicFormula
-from parser.ltlf import LTLfAnd, LTLfAtomic, LTLfNext, LTLfNot, LTLfUntil
+from parser.ltlf import LTLfAlways, LTLfAnd, LTLfAtomic, LTLfEquivalence, LTLfEventually, LTLfFalse, LTLfImplies, LTLfLast, LTLfNext, LTLfNot, LTLfOr, LTLfRelease, LTLfTrue, LTLfUntil, LTLfWeakNext
 from parser.ltlf import return_subformulae, LTLfParser
 from itertools import islice
 
