@@ -298,16 +298,19 @@ class App(QMainWindow):
 
         s = algorithm(Gamma, k, n, textboxValue)
         if s == 'empty':
-            textboxValue = 'You have not entered formula.'
+            textboxValue = 'Niste unijeli formulu.'
         elif(s == EOFError):
             textboxValue = 'EOFError'
         elif(s == 'str'):
-            textboxValue = 'Invalid syntax.'
-        else:
-            textboxValue = str(s)
+            textboxValue = 'Sintaksa je kriva.'
+        elif s == True:
+            textboxValue = 'Formula je istinita'
+        elif s == False:
+       	    textboxValue = 'Formula je neistinita'
 
-        QMessageBox.question(self, 'Message', "Result is: " + textboxValue, QMessageBox.Ok, QMessageBox.Ok)
+        QMessageBox.question(self, 'Rezultat', textboxValue, QMessageBox.Ok, QMessageBox.Ok)
         self.textbox1.setText("")
+
 
 
 
