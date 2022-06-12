@@ -23,17 +23,16 @@ import re
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional
 
-from ltlf2dfa.base import (
+from base import (
     AtomicFormula,
     AtomSymbol,
     BinaryOperator,
     Formula,
     UnaryOperator,
 )
-from ltlf2dfa.helpers import new_var
-from ltlf2dfa.ltlf2dfa import to_dfa
-from ltlf2dfa.pl import PLAtomic
-from ltlf2dfa.symbols import OpSymbol, Symbols
+
+from helpers import new_var
+from symbols import OpSymbol, Symbols
 
 
 class LTLfFormula(Formula, ABC):
@@ -247,8 +246,18 @@ class LTLfWeakNext(LTLfUnaryOperator):
     def negate(self) -> LTLfFormula:
         """Negate the formula."""
         return LTLfNext(self.f.negate())
+    
+class LTLfWeakUntil(LTLfBinaryOperator):
+    """Class for the LTLf Weak Until formula."""
 
+    @property
+    def operator_symbol(self) -> OpSymbol:
+        """Get the operator symbol."""
+        return Symbols.UNTIL.value
 
+    def to_nnf(self):
+        """Transform to NNF."""
+        return LTLfUntil([f.to_nnf() for f in self.formulas])
 
 
 class LTLfUntil(LTLfBinaryOperator):

@@ -162,48 +162,41 @@ def algorithm(Gamma, i, _l, s):
                         l[j_].add(psi[a])
 
                         
-        elif isinstance(psi[a], LTLfRelease):
+        elif isinstance(psi[a], LTLfRelease): # t1 R t2 <=> !(!t1 U !t2)
             t1 = next(islice(psi[a]._members()[1], 0, None))
             t2 = next(islice(psi[a]._members()[1], 1, None))
-            t1_never = True
-            t2_always = True
-            period = True
+            
+            n1 = LTLfNot(t1)
+            n2 = LTLfNot(t2)
             
             for j in range(i + _l + 1):
-                if (t1 in l[j]):
-                    t1_never = False
-                    break
-                if (not(t2 in l[j])):
-                    if j in range(i, i + _l + 1):
-                        period = False
-                    t2_always = False
-            if (t1_never):
-                if (t2_always): #t1 nikad nije istinita i t2 je uvijek istinita - t1 R t2 je istinita
-                    for j_ in range(i + _l + 1):
-                        l[j_].add(psi[a])
+                exists = False
+                for j_ in range(j, i + _l + 1):
+                    if(n2 in l[j_]):
+                        exists = True
+                        for j__ in range(j, j_):
+                            if(not(n1 in l[j__])):
+                                exists = False
+                        break #zanima nas samo kad se n2 prvi put ispuni
+                if(exists): #istinita je n1 U n2, odnosno !psi
+                    l[j].add(LTLfNot(psi[a]))
                 else:
-                    if (not period): #t1 nikad nije istinita i na nekom mjestu perioda t2 nije istinita - t1 R t2 nije istinita
-                        for j_ in range(i + _l + 1):
-                            l[j_].add(LTLfNot(psi[a]))
+                    #exists = False
+                    for j_ in range(i, j):
+                        if(i <= j and n2 in l[j_]):
+                            exists = True
+                            for j__ in range(i, j_):
+                                if(not(n1 in l[j__])):
+                                    exists = False
+                            for j__ in range(j, i + _l + 1):
+                                if(not(n1 in l[j__])):
+                                    exists = False
+                            break #zanima nas samo kad se n2 prvi put ispuni
+                    if(not exists): #n1 U n2 nije istinita, odnosno psi je istinita
+                        l[j].add(psi[a])
                     else:
-                        for j_ in range (i-1, -1, -1): #vracamo se unazad od perioda sve do trenutka kad t2 postane neistinita
-                            if (t2 in l[j_]):
-                                l[j_].add(psi[a])
-                            else:
-                                break
-                        for j__ in range (j_+1): #svugdje prije i ukljucujuci mjesto gdje je t2 neistinita - t1 R t2 nije istinita
-                            l[j__].add(LTLfNot(psi[a]))
-            else: #na j. mjestu t1 prvi put postane istinita
-                t2_always = True                
-                for j_ in range(j, -1, -1): #vracamo se unazad
-                    if (t2 in l[j_] and t2_always):
-                        l[j_].add(psi[a])
-                    else:
-                        t2_always = False
-                        break
-                if (not t2_always):
-                    for j__ in range(j_ + 1):
-                        l[j__].add(LTLfNot(psi[a]))  
+                        l[j].add(LTLfNot(psi[a]))
+                        
 
     return (bool)(psi[-1] in l[0])
 
